@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
 	if(argc != 3) {
 
 		printf("Usage: arp_client <eth_iface> <ip_address>\n");
-		return 0;
+		exit(-1);
 	}
 
 	else {
@@ -28,11 +28,20 @@ int main(int argc, char *argv[]) {
 	
 	/* enviarlo por ethernet */
 
-	eth_send ( iface, 
-		flood_arp.mac_dst, 
+	int send_flag;
+
+	send_flag = eth_send ( iface, 
+		MAC_BCAST_ADDR, 
 		ETH_ARP_TYPE, 
 		(unsigned char *) &flood_arp,
 		sizeof(flood_arp));
+
+	if(send_flag == -1) {
+
+		printf("Ha ocurrido un error en el envio");
+		eth_close(iface);
+		exit(-1);
+	}
 
 // 	// int eth_recv 
 // ( eth_iface_t * iface, 
@@ -53,12 +62,18 @@ int main(int argc, char *argv[]) {
 	mac_addr_str(recv_buffer.mac_src, mac_recv);
 
 	// Si no se ha recibido se vuelve a enviar la peticion ARP
-	if( rcv_flag != -2)  
+	if( rcv_flag > 0)  
 	{
 		printf("%s ~> %s\n", argv[2], mac_recv);
 	}
-	else 
+	else if (rcv_flag == -1) {
+		
+		printf("Ha ocurrido un error en la recepcion");
+	}
+	else if( rcv_flag == 0 )
 	{
+		
+		printf("No se ha recibido nada. Repetimos el envio");
 		eth_send ( iface, 
 		flood_arp.mac_dst, 
 		ETH_ARP_TYPE, 

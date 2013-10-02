@@ -1,8 +1,8 @@
 #ifndef _ARP_H
 #define _ARP_H
 
-#define MAC_BROADCAST_ADDR "FF:FF:FF:FF:FF:FF"
-#define IP_ANY_ADRESS "0.0.0.0"
+#define MAC_ANY_ADDR "0:0:0:0:0:0"
+#define IP_ANY_ADDR "0.0.0.0"
 #define ETH_ARP_TYPE 0x0806
 
 #include <rawnet.h>
