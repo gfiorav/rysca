@@ -1,12 +1,7 @@
-#ifndef _IPv4_H
-#define _IPv4_H
+#include "ipv4.h"
 
-#include <stdint.h>
-
-#define IPv4_ADDR_SIZE 4
-#define IPv4_STR_MAX_LENGTH 16
-
-typedef unsigned char ipv4_addr_t [IPv4_ADDR_SIZE];
+#include <stdio.h>
+#include <stdlib.h>
 
 /*
  * uint16_t ipv4_checksum ( unsigned char * data, int len )
@@ -21,7 +16,29 @@ typedef unsigned char ipv4_addr_t [IPv4_ADDR_SIZE];
  * VALOR DEVUELTO:
  *   El valor del checksum calculado.
  */
-uint16_t ipv4_checksum ( unsigned char * data, int len );
+uint16_t ipv4_checksum ( unsigned char * data, int len )
+{
+  int i;
+  uint16_t word16;
+  unsigned int sum = 0;
+    
+  /* Make 16 bit words out of every two adjacent 8 bit words in the packet
+   * and add them up */
+  for (i=0; i<len; i=i+2) {
+    word16 = ((data[i] << 8) & 0xFF00) + (data[i+1] & 0x00FF);
+    sum = sum + (unsigned int) word16;	
+  }
+
+  /* Take only 16 bits out of the 32 bit sum and add up the carries */
+  while (sum >> 16) {
+    sum = (sum & 0xFFFF) + (sum >> 16);
+  }
+
+  /* One's complement the result */
+  sum = ~sum;
+
+  return (uint16_t) sum;
+}
 
 
 /* void ipv4_addr_str ( ipv4_addr_t addr, char* str );
@@ -35,8 +52,13 @@ uint16_t ipv4_checksum ( unsigned char * data, int len );
  *    'str': Memoria donde se desea almacenar la cadena de texto generada.
  *           Deben reservarse al menos 'IPv4_STR_MAX_LENGTH' bytes.
  */
-void ipv4_addr_str ( ipv4_addr_t addr, char* str );
-
+void ipv4_addr_str ( ipv4_addr_t addr, char* str )
+{
+  if (str != NULL) {
+    sprintf(str, "%d.%d.%d.%d",
+            addr[0], addr[1], addr[2], addr[3]);
+  }
+}
 
 /* int ipv4_str_addr ( char* str, ipv4_addr_t addr );
  *
@@ -54,6 +76,25 @@ void ipv4_addr_str ( ipv4_addr_t addr, char* str );
  *   La función devuelve -1 si la cadena de texto no representaba una
  *   dirección IPv4.
  */
-int ipv4_str_addr ( char* str, ipv4_addr_t addr );
+int ipv4_str_addr ( char* str, ipv4_addr_t addr )
+{
+  int err = -1;
 
-#endif /* _IPv4_H */
+  if (str != NULL) {
+    unsigned int addr_int[IPv4_ADDR_SIZE];
+    int len = sscanf(str, "%d.%d.%d.%d", 
+                     &addr_int[0], &addr_int[1], 
+                     &addr_int[2], &addr_int[3]);
+
+    if (len == IPv4_ADDR_SIZE) {
+      int i;
+      for (i=0; i<IPv4_ADDR_SIZE; i++) {
+        addr[i] = (unsigned char) addr_int[i];
+      }
+      
+      err = 0;
+    }
+  }
+  
+  return err;
+}

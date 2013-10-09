@@ -56,4 +56,38 @@ void ipv4_addr_str ( ipv4_addr_t addr, char* str );
  */
 int ipv4_str_addr ( char* str, ipv4_addr_t addr );
 
+
+/*
+Esta funcion iniciaiza la interfaz Ethernet asi como las tablas de rutas y 
+provee el contexto necesario para el envio y la recepcion de los paquetes
+*/
+ipv4_iface_t * ipv4_open( char * ifname ); 
+
+/*
+Devuelve el nombre del contexto ip
+*/
+ipv4_getname( ipv4_iface_t * iface );
+
+/*
+Devuelve la ip de nuestro equipo
+*/
+void ipv4_getaddr( ipv4_iface_t * iface, ipv4_address_t addr );
+
+/*
+Envia un paquete ip
+*/
+ipv4_send( ipv4_iface_t, ipv4_address_t dst, uint16_t type, unsigned char * payload, int payload_len );
+
+/*
+Recibe un paquete ip
+*/
+ipv4_recv( ipv4_iface_t, ipv4_address_t dst, uint16_t type, unsigned char buffer[], long int timeout );
+
+/*
+Cierra el contexto ip
+*/
+
+int ipv4_close( ipv4_iface_t * iface ); 
+
+
 #endif /* _IPv4_H */
