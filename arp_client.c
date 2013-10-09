@@ -10,13 +10,25 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
-	unsigned char mac_received[MAC_ADDR_SIZE];
+	unsigned char * mac_received = (unsigned char*) malloc(MAC_ADDR_SIZE);
 	eth_iface_t * iface = eth_open( argv[1]);
 	ipv4_addr_t addr;
 	ipv4_str_addr ( argv[2], addr );
-	arp_resolve( iface, addr, mac_received  );
+	printf("Llamamos a arp_resolve... \n");
+	int result = arp_resolve( iface, addr, mac_received  );
+	
+	if (result == -1 ) {
 
-	printf("Hemos recibido %s\n", mac_received );
+		printf("No se ha podido traducir la ip\n");
+	
+	} else {
+
+		char mac_str[MAC_STR_SIZE];
+		mac_addr_str( mac_received, mac_str );
+		printf("El cliente verifica que la mac es %s\n", mac_str );
+	}
+
+	free(mac_received);
 	eth_close(iface);
 
 	return 0;	

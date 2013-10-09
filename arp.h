@@ -11,8 +11,8 @@
 #define MAC_ANY_ADDR "0:0:0:0:0:0"
 #define IP_ANY_ADDR "0.0.0.0"
 #define ETH_ARP_TYPE 0x0806
-#define IPv4_STR_SIZE 12
-#define MAC_STR_SIZE  16
+#define IPv4_STR_SIZE 24
+#define MAC_STR_SIZE  32
 
 #define LVL2_TYPE 1  	  	//para arp mac
 #define LVL3_TYPE 0x0800 	//para arp ip
